@@ -1,0 +1,11 @@
+from extensions import db
+from datetime import datetime, timezone
+
+class VaultItem(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+  title = db.Column(db.String(120), nullable=False)
+  encrypted_data = db.Column(db.Text, nullable=False)
+  created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+  updated_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+  
