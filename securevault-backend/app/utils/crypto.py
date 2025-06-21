@@ -1,0 +1,11 @@
+from cryptography.fernet import Fernet
+import os
+
+ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY").encode()
+fernet = Fernet(ENCRYPTION_KEY)
+
+def encrypt_data(data: str) -> str:
+  return fernet.encryp(data.encode()).decode()
+
+def decrypt_data(token: str) -> str:
+  return fernet.decrypt(token.encode()).decode()
