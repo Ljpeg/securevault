@@ -5,7 +5,9 @@ ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY").encode()
 fernet = Fernet(ENCRYPTION_KEY)
 
 def encrypt_data(data: str) -> str:
-  return fernet.encryp(data.encode()).decode()
+  return fernet.encrypt(data.encode()).decode()
 
 def decrypt_data(token: str) -> str:
   return fernet.decrypt(token.encode()).decode()
+
+print("Encryption_key:", os.getenv("ENCRYPTION_KEY"))

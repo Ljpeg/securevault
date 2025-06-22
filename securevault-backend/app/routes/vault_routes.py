@@ -27,7 +27,7 @@ def get_vault_items():
 @jwt_required()
 def new_vault_item():
   user_id = get_jwt_identity()
-  data = request.get_json
+  data = request.get_json()
   title = data.get("title")
   raw_data = data.get("data")
 
@@ -35,14 +35,14 @@ def new_vault_item():
     return jsonify({"error": "Title and data are required"}), 400
   
   encrypted = encrypt_data(raw_data)
-  item = VaultItem(title=title, encrypt_data=encrypted, user_id=user_id)
+  item = VaultItem(title=title, encrypted_data=encrypted, user_id=user_id)
 
   db.session.add(item)
   db.session.commit()
 
   return jsonify({"message": "new vault item created!", "id": item.id}), 201
 
-@vault_bp.route('<item_id>', methods=['GET'])
+@vault_bp.route('/<item_id>', methods=['GET'])
 @jwt_required()
 def get_a_vault_item(item_id):
   user_id = get_jwt_identity()
@@ -54,7 +54,7 @@ def get_a_vault_item(item_id):
   return jsonify({
     "id": item.id, 
     "title": item.title,
-    "data": decrypt_data(item.encrypted_dat), 
+    "data": decrypt_data(item.encrypted_data), 
     "created_at": item.created_at,
     "updated_at": item.updated_at
     }), 200
@@ -83,7 +83,7 @@ def update_vault_item(item_id):
 @vault_bp.route('/<item_id>', methods=['DELETE'])
 @jwt_required()
 def delete_vault_item(item_id):
-  user_id = get_jwt_identity
+  user_id = get_jwt_identity()
   item = VaultItem.query.filter_by(user_id=user_id, id=item_id).first()
   
   if not item:
