@@ -14,6 +14,7 @@ def register_new_user():
   data = request.get_json()
   email = data.get("email")
   password = data.get("password")
+  role = data.get("role", "user")
 
   if not email or not password:
     return jsonify({"error": "Email and password are required"}), 400
@@ -21,7 +22,7 @@ def register_new_user():
   if VaultUser.query.filter_by(email=email).first():
     return jsonify({"error": "Email already registered"}), 409
   
-  new_user = VaultUser(email=email)
+  new_user = VaultUser(email=email, role=role)
   new_user.set_password(password)
   db.session.add(new_user)
   db.session.commit()

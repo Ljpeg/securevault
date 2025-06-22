@@ -1,4 +1,4 @@
-from models.vault_log import VaultLog
+from app.models.vault_log import VaultLog
 from extensions import db
 
 def log_action(user_id: int, item_id: int, action: str):
