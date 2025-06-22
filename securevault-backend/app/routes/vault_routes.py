@@ -3,6 +3,7 @@ from extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.vault_item import VaultItem
 from app.utils.crypto import encrypt_data, decrypt_data
+from app.utils.logging import log_action
 
 vault_bp = Blueprint('vault', __name__, url_prefix='/vault')
 
@@ -12,6 +13,10 @@ vault_bp = Blueprint('vault', __name__, url_prefix='/vault')
 def get_vault_items():
   user_id = get_jwt_identity()
   items = VaultItem.query.filter_by(user_id=user_id).all()
+
+  for item in items:
+      log_action(user_id, item.id, "read")
+      
   return jsonify([
     {
       "id": item.id, 
@@ -40,6 +45,7 @@ def new_vault_item():
   db.session.add(item)
   db.session.commit()
 
+  log_action(user_id, item.id, "create")
   return jsonify({"message": "new vault item created!", "id": item.id}), 201
 
 @vault_bp.route('/<item_id>', methods=['GET'])
@@ -50,6 +56,8 @@ def get_a_vault_item(item_id):
   
   if not item:
     return jsonify({"error": "vault item not found"}), 404
+  
+  log_action(user_id, item_id, "read")
 
   return jsonify({
     "id": item.id, 
@@ -76,8 +84,10 @@ def update_vault_item(item_id):
     item.title = title
   if raw_data:
     item.encrypted_data = encrypt_data(raw_data)
-  
+
   db.session.commit()
+
+  log_action(user_id, item_id, "update")
   return jsonify({"message": "vault item updated!"}), 200
 
 @vault_bp.route('/<item_id>', methods=['DELETE'])
@@ -91,4 +101,6 @@ def delete_vault_item(item_id):
   
   db.session.delete(item)
   db.session.commit()
+
+  log_action(user_id, item_id, "delete")
   return jsonify({"message": "vault item deleted!"}), 200
