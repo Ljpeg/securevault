@@ -43,7 +43,7 @@ def login():
     return jsonify({"error": "Invalid email or password"}), 401
   
   access_token = create_access_token(identity=user.id)
-  return jsonify({"access_token": access_token}), 200
+  return jsonify({"the access_token is": access_token}), 200
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():

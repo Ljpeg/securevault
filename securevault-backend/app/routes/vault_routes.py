@@ -99,8 +99,9 @@ def delete_vault_item(item_id):
   if not item:
     return jsonify({"error": "vault item not found"})
   
+  log_action(user_id, item_id, "delete")
+  
   db.session.delete(item)
   db.session.commit()
 
-  log_action(user_id, item_id, "delete")
   return jsonify({"message": "vault item deleted!"}), 200

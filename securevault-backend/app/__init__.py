@@ -3,6 +3,7 @@ from config import Config
 from extensions import db, jwt, migrate
 from app.routes.auth_routes import auth_bp
 from app.routes.vault_routes import vault_bp
+from app.routes.admin_routes import admin_bp
 
 
 def create_app():
@@ -17,5 +18,6 @@ def create_app():
   #register blueprints
   app.register_blueprint(auth_bp)
   app.register_blueprint(vault_bp)
+  app.register_blueprint(admin_bp)
 
   return app

@@ -8,4 +8,4 @@ class VaultItem(db.Model):
   encrypted_data = db.Column(db.Text, nullable=False)
   created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
   updated_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
-  vault_logs = db.relationship('VaultLog', backref='item', lazy=True)
+  vault_logs = db.relationship('VaultLog', backref='vault_item', lazy=True)
