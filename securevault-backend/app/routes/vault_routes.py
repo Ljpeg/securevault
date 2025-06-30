@@ -12,7 +12,7 @@ vault_bp = Blueprint('vault', __name__, url_prefix='/vault')
 @jwt_required()
 def get_vault_items():
   user_id = get_jwt_identity()
-  items = VaultItem.query.filter_by(user_id=user_id).all()
+  items = VaultItem.query.filter_by(user_id=user_id, is_deleted=False).all()
 
   for item in items:
       log_action(user_id, item.id, "read")
@@ -46,13 +46,13 @@ def new_vault_item():
   db.session.commit()
 
   log_action(user_id, item.id, "create")
-  return jsonify({"message": "new vault item created!", "id": item.id}), 201
+  return jsonify({"message": "new vault item created!", "id": item.id, "user": item.user_id}), 201
 
 @vault_bp.route('/<item_id>', methods=['GET'])
 @jwt_required()
 def get_a_vault_item(item_id):
   user_id = get_jwt_identity()
-  item = VaultItem.query.filter_by(user_id=user_id, id=item_id).first()
+  item = VaultItem.get_active_item(item_id, user_id)
   
   if not item:
     return jsonify({"error": "vault item not found"}), 404
@@ -71,7 +71,7 @@ def get_a_vault_item(item_id):
 @jwt_required()
 def update_vault_item(item_id):
   user_id = get_jwt_identity()
-  item = VaultItem.query.filter_by(user_id=user_id, id=item_id).first()
+  item = VaultItem.get_active_item(item_id, user_id)
 
   if not item:
     return jsonify({"error": "vault item not found"})
@@ -94,14 +94,14 @@ def update_vault_item(item_id):
 @jwt_required()
 def delete_vault_item(item_id):
   user_id = get_jwt_identity()
-  item = VaultItem.query.filter_by(user_id=user_id, id=item_id).first()
+  item = VaultItem.get_active_item(item_id, user_id)
   
   if not item:
     return jsonify({"error": "vault item not found"})
   
-  log_action(user_id, item_id, "delete")
+  item.is_deleted = True
   
-  db.session.delete(item)
+  log_action(user_id, item_id, "delete", item_deleted=True)
   db.session.commit()
 
   return jsonify({"message": "vault item deleted!"}), 200
